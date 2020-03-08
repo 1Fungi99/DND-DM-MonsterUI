@@ -1,0 +1,39 @@
+body {
+  background: url(http://www.nerdsonearth.com/wp-content/uploads/2015/04/FullyArmoredAdventuringParty2.jpg)
+    center no-repeat fixed;
+  background-size: cover;
+
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.container {
+  background-color: rgba(248, 229, 215, 0.692);
+}
+.headerContainer {
+  position: relative;
+  padding-top: 1%;
+  text-align: center;
+}
+
+.inputContainer {
+  text-align: left;
+}
+
+.monsterContainer {
+  margin-top: 15px;
+  text-align: center;
+}
+.header {
+  color: #fe0000;
+  margin-bottom: auto;
+}
+
+.btn-primary {
+  background-color: #fe0000;
+  border-color: transparent;
+  margin-left: 15px;
+}
