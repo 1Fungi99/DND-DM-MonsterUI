@@ -47,3 +47,11 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+.ABNumbers {
+  border-bottom: 2px solid black;
+  /* background-color: black; */
+}
+
+.ABNames {
+  border-bottom: 2px solid black;
+}

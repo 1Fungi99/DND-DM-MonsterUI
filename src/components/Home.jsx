@@ -6,6 +6,9 @@ export default class Home extends Component {
     monsterQueryChange: "",
     monsterQuery: "",
 
+    //checks if user searched for a monster
+    searched: false,
+
     //Monster Name
     monsterName: "Search a Monster!",
 
@@ -26,7 +29,8 @@ export default class Home extends Component {
     monsterHP: "",
     monsterHitDice: "",
 
-    monsterProf: []
+    monsterProf: [],
+    complete: false
   };
 
   handleChange = event => {
@@ -42,9 +46,22 @@ export default class Home extends Component {
       monsterQuery: this.state.monsterQueryChange
         .split(" ")
         .join("-")
-        .toLowerCase()
+        .toLowerCase(),
+      monsterName: "",
+      monsterAC: "",
+      monsterSTR: "",
+      monsterDEX: "",
+      monsterCON: "",
+      monsterINT: "",
+      monsterWIS: "",
+      monsterCHA: "",
+      monsterSpeed: "",
+      monsterHP: "",
+      monsterHitDice: "",
+      monsterProf: "",
+      complete: false,
+      searched: false
     });
-    // console.log("Monster Query: " + this.state.monsterQuery);
     axios
       .get(
         this.baseURL +
@@ -54,9 +71,14 @@ export default class Home extends Component {
             .toLowerCase()
       )
       .then(res => {
+        // Displays pulled data; good for file structure
+        //================================================
         const data = res.data;
         console.log(data);
+        //================================================
+
         this.bindData(data);
+        this.setState({ searched: true });
       })
       .catch(function(error) {
         console.log(error);
@@ -78,11 +100,11 @@ export default class Home extends Component {
       monsterHitDice: data.hit_dice,
       monsterProf: data.proficiencies
     });
-    console.log(this.state);
     this.speedData();
     this.profData();
   };
 
+  //Speed data fixing
   speedData = () => {
     var speedArray = [];
     for (var key in this.state.monsterSpeed) {
@@ -95,7 +117,12 @@ export default class Home extends Component {
   };
 
   profData = () => {
+    //Declaring variables for later use
+    //================================================
     var profArray = [];
+    var prof = [];
+    var profFinal = [];
+    //================================================
     for (var i = 0; i < this.state.monsterProf.length; i++) {
       for (var key in this.state.monsterProf[i]) {
         if (this.state.monsterProf[i].hasOwnProperty(key)) {
@@ -103,14 +130,113 @@ export default class Home extends Component {
         }
       }
     }
-    // profArray.filter();
-    console.log(profArray);
+
+    // Loop that takes out any element with url as a key
+    for (var j = 0; j < profArray.length; j++) {
+      var n = profArray[j].includes("url");
+      console.log(n);
+      if (n === true) {
+        profArray.splice(j, 1);
+      }
+    }
+
+    for (var h = 0; h < profArray.length / 2; h++) {
+      var base = h * 2;
+      var basePlus = base + 1;
+      prof.push(profArray[base] + " " + profArray[basePlus]);
+    }
+    for (var k = 0; k < prof.length; k++) {
+      profArray = prof[k].split(" ");
+      for (var p = 0; p < profArray.length; p++) {
+        var profArrayIndex = profArray[p];
+        //checking to see if array has the values of "name: or value:"
+        //================================================
+        var m = profArrayIndex.includes("name:");
+        var z = profArrayIndex.includes("value:");
+        if (m === true) {
+          this.remove(p, profArray);
+        }
+        if (z === true) {
+          this.remove(p, profArray);
+        }
+        //================================================
+      }
+      profFinal.push(profArray.join(" ") + "+");
+    }
+    var profDisplay = [];
+    for (var x = 0; x < profFinal.length; x++) {
+      // profDisplay.push("<h5>" + profFinal[x] + "</h5>");
+      profDisplay.push(profFinal[x]);
+    }
+    this.setState({
+      monsterProf: profDisplay,
+      complete: true
+    });
+    console.log(this.state.monsterProf);
   };
 
-  // profFilter = () =>{
-  //   return( if (!profArray.includes("url:"))
-  //   )
-  // }
+  profRender = () => {
+    if (!this.state.complete) {
+      return null;
+    } else {
+      // this.state.monsterProf.map((item, i) => {
+      //   return <h5>{this.state.monsterProf[i]}</h5>;
+      // });
+      return (
+        <>
+          {this.state.monsterProf.map((Prof, i) => (
+            <h5 key={i}>{this.state.monsterProf[i]}</h5>
+          ))}
+        </>
+      );
+      // return this.state.monsterProf;
+    }
+  };
+  remove = (p, profArray) => {
+    profArray.splice(p, 1);
+  };
+
+  searched = () => {
+    if (this.state.searched) {
+      return (
+        <div className="container monsterContainer">
+          <h3>Searched Monster:</h3>
+          <h4 className="align-left">{this.state.monsterName}</h4>
+          <div className="row">
+            <div className="col-sm-5 align-left">
+              <h5>Hit Points: {this.state.monsterHP}</h5>
+              <h5>Hit Die: {this.state.monsterHitDice}</h5>
+              <h5>Armor Class: {this.state.monsterAC}</h5>
+              <this.speedData />
+              <div className="row ABNames">
+                <h5 className="row-spacing">STR</h5>
+                <h5 className="row-spacing">DEX</h5>
+                <h5 className="row-spacing">CON</h5>
+                <h5 className="row-spacing">INT</h5>
+                <h5 className="row-spacing">WIS</h5>
+                <h5 className="row-spacing">CHA</h5>
+              </div>
+              <div className="row ABNumbers">
+                <h5 className="row-spacing">{this.state.monsterSTR}</h5>
+                <h5 className="row-spacing">{this.state.monsterDEX}</h5>
+                <h5 className="row-spacing">{this.state.monsterCON}</h5>
+                <h5 className="row-spacing">{this.state.monsterINT}</h5>
+                <h5 className="row-spacing">{this.state.monsterWIS}</h5>
+                <h5 className="row-spacing">{this.state.monsterCHA}</h5>
+              </div>
+              <div>
+                {/*  Div for Proficiencies */}
+                <this.profRender />
+              </div>
+            </div>
+            <div className="col-sm-5 align-left"></div>
+          </div>
+        </div>
+      );
+    } else {
+      return null;
+    }
+  };
 
   render() {
     return (
@@ -140,34 +266,7 @@ export default class Home extends Component {
           </form>
         </div>
 
-        <div className="container monsterContainer">
-          <h3>Searched Monster:</h3>
-          <h4 className="align-left">{this.state.monsterName}</h4>
-          <div className="row">
-            <div className="col-sm-5 align-left">
-              <h5>Hit Points: {this.state.monsterHP}</h5>
-              <h5>Hit Die: {this.state.monsterHitDice}</h5>
-              <h5>Armor Class: {this.state.monsterAC}</h5>
-              <this.speedData />
-              <div className="row">
-                <h5 className="row-spacing">STR</h5>
-                <h5 className="row-spacing">DEX</h5>
-                <h5 className="row-spacing">CON</h5>
-                <h5 className="row-spacing">INT</h5>
-                <h5 className="row-spacing">WIS</h5>
-                <h5 className="row-spacing">CHA</h5>
-              </div>
-              <div className="row">
-                <h5 className="row-spacing">{this.state.monsterSTR}</h5>
-                <h5 className="row-spacing">{this.state.monsterDEX}</h5>
-                <h5 className="row-spacing">{this.state.monsterCON}</h5>
-                <h5 className="row-spacing">{this.state.monsterINT}</h5>
-                <h5 className="row-spacing">{this.state.monsterWIS}</h5>
-                <h5 className="row-spacing">{this.state.monsterCHA}</h5>
-              </div>
-            </div>
-          </div>
-        </div>
+        <this.searched />
       </>
     );
   }
