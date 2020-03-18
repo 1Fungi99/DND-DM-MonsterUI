@@ -30,12 +30,13 @@ export default class Home extends Component {
     monsterHitDice: "",
 
     monsterProf: [],
+    SavingThrowArray: [],
+    SkillArray: [],
     complete: false
   };
 
   handleChange = event => {
     this.setState({ monsterQueryChange: event.target.value });
-    console.log(event.target.value);
   };
 
   baseURL = "http://www.dnd5eapi.co/api/monsters/";
@@ -134,7 +135,6 @@ export default class Home extends Component {
     // Loop that takes out any element with url as a key
     for (var j = 0; j < profArray.length; j++) {
       var n = profArray[j].includes("url");
-      console.log(n);
       if (n === true) {
         profArray.splice(j, 1);
       }
@@ -165,28 +165,47 @@ export default class Home extends Component {
     }
     var profDisplay = [];
     for (var x = 0; x < profFinal.length; x++) {
-      // profDisplay.push("<h5>" + profFinal[x] + "</h5>");
       profDisplay.push(profFinal[x]);
     }
     this.setState({
       monsterProf: profDisplay,
       complete: true
     });
-    console.log(this.state.monsterProf);
+
+    // Loop to shorten Saving Throws
+    //===========================================================
+    var SavingThrowTemp = [];
+    var SkillTemp = [];
+    // console.log(this.state.monsterProf);
+    for (i = 0; i < this.state.monsterProf.length; i++) {
+      if (this.state.monsterProf[i].includes("Skill: ")) {
+        var preSkill = this.state.monsterProf[i].split(" ");
+        preSkill.splice(0, 1);
+        var Skill = preSkill.join(" ");
+        SkillTemp.push(Skill);
+      }
+      if (this.state.monsterProf[i].includes("Saving Throw: ")) {
+        var preSavingThrow = this.state.monsterProf[i].split(" ");
+        preSavingThrow.splice(0, 2);
+        var SavingThrow = preSavingThrow.join(" ");
+        SavingThrowTemp.push(SavingThrow);
+      }
+    }
+    this.setState({
+      SavingThrowArray: SavingThrowTemp.join(", "),
+      SkillArray: SkillTemp.join(", ")
+    });
+    //===========================================================
   };
 
   profRender = () => {
     if (!this.state.complete) {
       return null;
     } else {
-      // this.state.monsterProf.map((item, i) => {
-      //   return <h5>{this.state.monsterProf[i]}</h5>;
-      // });
       return (
         <>
-          {this.state.monsterProf.map((Prof, i) => (
-            <h5 key={i}>{this.state.monsterProf[i]}</h5>
-          ))}
+          <h5>Saving Throw: {this.state.SavingThrowArray}</h5>
+          <h5>Skill: {this.state.SkillArray}</h5>
         </>
       );
       // return this.state.monsterProf;
